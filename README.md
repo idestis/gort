@@ -145,7 +145,8 @@ FROM alpine
 WORKDIR /app
 # Install dependecies
 RUN apk add --no-cache bash nodejs ca-certificates && \
-    wget https://githublink/gort-amd64-linux -O gort && chmox +x gort
+    wget https://github.com/idestis/gort/releases/download/1.0.0/gort_1.0.0_linux_amd64 -O gort && \
+    chmod +x gort
 # Copy our scripts from builder step
 COPY --from=builder /app/dist /app/dist
 # PORT variable for Gort

@@ -108,6 +108,7 @@ func startScript(w http.ResponseWriter, r *http.Request) {
 	_, err = exec.LookPath(script.Executor)
 	if err != nil {
 		http.Error(w, "Requested executor is not installed", 500)
+		return
 	}
 
 	// Check if requested script exist in directory
@@ -116,7 +117,6 @@ func startScript(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Requested script is not found in the scripts directory", 501)
 		return
 	}
-
 	cmd := exec.Command(script.Executor, scriptsDir+"/"+script.Script)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -127,6 +127,7 @@ func startScript(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	cmd.Start()
+	log.Println("Just ran subprocess of", script.Script, "with PID", cmd.Process.Pid)
 	fmt.Fprintf(w, "The function will be executed in the background. Refer to container logs to see the output")
 }
 
