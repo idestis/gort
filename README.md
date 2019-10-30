@@ -24,6 +24,8 @@ $ ./gort
 
 `SCRIPTS_DIR` by default will search scripts at **./dist** in the same directory where the binary
 
+`GORT_RATE_LIMIT` is a parameter to set Throttle Limit, Throttle is not a rate-limiter per user. Instead, it just puts a ceiling on the number of current in-flight requests
+
 ### Endpoints
 
 #### Health
