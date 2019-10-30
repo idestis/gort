@@ -177,8 +177,11 @@ Refer to [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## Dependencies
 
-* github.com/go-chi/chi
+* [github.com/go-chi/chi](https://github.com/go-chi/chi)
 
 ## TBD
 
 * Authorization method to protect your endpoints
+* Rate Limit
+* Subprocesses list
+* Cleanup zombie subprocesses
