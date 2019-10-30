@@ -102,7 +102,7 @@ Allows you to start script from the scripts directory
 * **Sample Call:**
 
 ```bash
-$ curl -X POST https://127.0.0.1:5000/v1/start -d '{"executor":"python", "script": "crawler.py"}'
+$ curl -X POST http://127.0.0.1:5000/v1/start -d '{"executor":"python", "script": "crawler.py"}'
 The function will be executed in the background. Refer to container logs to see the output
 ```
 
@@ -155,6 +155,21 @@ ENV PORT 8080
 EXPOSE 8080
 ENTRYPOINT ['gort']
 ```
+
+After when we published and executed this docker container elsewhere, we can send requests to start any our function
+
+```bash
+$ curl -X POST https://address/v1/start -d '{"executor":"python", "script": "example.py"}'
+The function will be executed in the background. Refer to container logs to see the output
+```
+
+In `STDOUT` of the container we will be able to see logs
+
+```bash
+2019/10/30 12:19:01 Just ran subprocess of example.py with PID 52177
+```
+
+For instance, you can schedule this runs using your services or any CI tool like Jenkins, [drone.io](https://drone.io)
 
 ## Contribute
 
