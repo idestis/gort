@@ -190,6 +190,5 @@ Refer to [CONTRIBUTING.md](./CONTRIBUTING.md)
 ## TBD
 
 * Authorization method to protect your endpoints
-* Rate Limit
 * Subprocesses list
 * Cleanup zombie subprocesses
