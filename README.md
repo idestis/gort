@@ -2,9 +2,10 @@
 
 [![Build Status](https://cloud.drone.io/api/badges/idestis/gort/status.svg)](https://cloud.drone.io/idestis/gort)
 
-![Moving Gopher as GORT](./assets/MovingGopher.png)
 
-**GORT** is a simple HTTP handler to receive remote calls to run scripts bundled in Docker containers
+![Moving Gopher as GORT](./assets/gort.png)
+
+**GORT** is a simple HTTP handler to receive remote calls to run scripts bundled in Docker containers. Why the name is `gort` -  because the idea is "GO-Run-Things"
 
 ## Usage
 
@@ -12,7 +13,12 @@
 
 To use `gort` in your Docker container download the latest version from [Project Release Page](https://github.com/idestis/gort/releases)
 
-**Gort** uses the following environment variables for a customized run
+```bash
+$ ./gort
+2019/10/30 12:32:06 Gort is started on port 5000
+```
+
+**GORT** uses the following environment variables for a customized run
 
 `PORT` as default will be handled over **5000** port
 
