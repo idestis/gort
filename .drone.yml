@@ -1,0 +1,24 @@
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+  - name: fetch-tags
+    image: docker:git
+    commands:
+      - git fetch --tags
+  
+  - name: release binaries
+    image: goreleaser/goreleaser:v0.108.0
+    commands:
+      - git diff
+      - goreleaser release --rm-dist --skip-validate
+    environment:
+      GO111MODULE: on
+      GITHUB_TOKEN: { from_secret: GITHUB_TOKEN }
+    when:
+      event:
+        - tag

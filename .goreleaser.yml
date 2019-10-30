@@ -1,0 +1,15 @@
+builds:
+  - id: gort
+    binary: gort
+    main: ./gort.go
+    goos: [freebsd, windows, linux, darwin]
+    goarch: [amd64, arm, arm64]
+    goarm: [6, 7]
+    ignore:
+      - { goos: darwin, goarch: 386 }
+      - { goos: linux, goarch: arm, goarm: 7 }
+
+archives:
+  - id: gort
+    builds: [gort]
+    format: binary
