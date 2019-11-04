@@ -19,6 +19,7 @@ type Script struct {
 	Executor string   `json:"executor"`
 	Script   string   `json:"script"`
 	EnvVars  []string `json:"env_vars"`
+	Args     []string `json:"args"`
 }
 
 const (
@@ -110,16 +111,25 @@ func startScriptHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Requested script is not found in the scripts directory", 501)
 		return
 	}
-
-	cmd := exec.Command(script.Executor, scriptsDir+"/"+script.Script)
+	command := []string{scriptsDir + "/" + script.Script}
+	cmd := exec.Command(script.Executor, command...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+
+	// Append arguments to command if they are present in request
+	if len(script.Args) >= 1 {
+		command = append(command, script.Args...)
+		cmd = exec.Command(script.Executor, command...)
+	}
+
+	// Append arguments to command.Environment if they are present in request
 	if len(script.EnvVars) >= 1 {
 		cmd.Env = os.Environ()
 		for _, envVar := range script.EnvVars {
 			cmd.Env = append(cmd.Env, envVar)
 		}
 	}
+	// Start and don't wait till execution ends
 	cmd.Start()
 	log.Println("Just ran subprocess of", script.Script, "with PID", cmd.Process.Pid)
 	fmt.Fprintf(w, "The function will be executed in the background. Refer to container logs to see the output")
