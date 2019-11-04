@@ -7,6 +7,8 @@
 
 **GORT** is a simple HTTP handler to receive remote calls to run scripts bundled in Docker containers. Why the name is `gort` -  because the idea is "GO-Run-Things"
 
+**Safety notice:** Until this tool doesn't have the authorization, you need to cover it using any firewalls or use it as internal service in your k8s cluster without exposing it outside.
+
 ## Usage
 
 > Refer to [Install](#Install) for getting `gort` binary
