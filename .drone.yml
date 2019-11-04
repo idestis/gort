@@ -10,6 +10,14 @@ steps:
     image: docker:git
     commands:
       - git fetch --tags
+
+  - name: tests
+    image: golang
+    environment:
+      GO111MODULE: on
+    commands:
+      - mkdir dist
+      - go test --race ./...
   
   - name: release binaries
     image: goreleaser/goreleaser:v0.108.0
