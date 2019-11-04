@@ -83,12 +83,10 @@ Allows you to start script from the scripts directory
   {
     "executor": "node",
     "script": "script.js",
-    // Will prepare environment for the script execution
     "env_vars": [
       "FOO=bar",
       "BAR=foo"
     ],
-    // Will pass arguments to the script on execution
     "args": [
       "--foo=bar",
       "--bar=foo"
