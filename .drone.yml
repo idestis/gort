@@ -15,6 +15,7 @@ steps:
     image: golang
     environment:
       GO111MODULE: on
+      CC_TEST_REPORTER_ID: { from_secret: CC_TEST_REPORTER_ID }
     commands:
       - mkdir dist
       - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 --output test-reporter
