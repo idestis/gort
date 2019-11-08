@@ -21,7 +21,7 @@ steps:
       - chmod +x test-reporter
       - ./test-reporter before-build
       - go test --race -coverprofile c.out ./...
-      - ./test-reporter after-build -t gocov
+      - ./test-reporter after-build -p github.com/idestis/gort
   
   - name: release binaries
     image: goreleaser/goreleaser:v0.108.0
