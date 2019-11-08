@@ -13,7 +13,7 @@ func Find(slice []string, val string) (int, bool) {
 	return -1, false
 }
 
-// scanScripts will fill our slice of scripts on startup
+// ScanScripts will parse folder to get scripts list on startup
 // TODO: implement background scanner
 func ScanScripts(dir string) []string {
 	var data []string
