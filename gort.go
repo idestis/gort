@@ -14,7 +14,7 @@ import (
 	"github.com/idestis/gort/utils"
 )
 
-// Script will hold our entity for run
+// Script sctruct will hold an entity to define which script we should run
 type Script struct {
 	Executor string   `json:"executor"`
 	Script   string   `json:"script"`
@@ -75,7 +75,7 @@ func main() {
 
 }
 
-// listScripts will return scripts list from SCRIPTS_DIR
+// listScriptsHandler will return scripts list from the SCRIPTS_DIR
 func listScriptsHandler(w http.ResponseWriter, r *http.Request) {
 	if len(scripts) == 0 {
 		fmt.Fprintf(w, "%s seems like empty", scriptsDir)
@@ -86,7 +86,7 @@ func listScriptsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// startScript will start script and output will be in stdoutput
+// startScriptHandler will start requested script and print output to stdout
 func startScriptHandler(w http.ResponseWriter, r *http.Request) {
 	var script Script
 	err := json.NewDecoder(r.Body).Decode(&script)
@@ -135,7 +135,7 @@ func startScriptHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "The function will be executed in the background. Refer to container logs to see the output")
 }
 
-// NotFoundHandler will return custom message
+// NotFoundHandler will return error message
 func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "This page does not exist!", 404)
 }
