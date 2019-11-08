@@ -17,7 +17,11 @@ steps:
       GO111MODULE: on
     commands:
       - mkdir dist
-      - go test --race ./...
+      - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 --output test-reporter
+      - chmod +x test-reporter
+      - ./test-reporter before-build
+      - go test --race -coverprofile c.out ./...
+      - ./test-reporter after-build -t gocov
   
   - name: release binaries
     image: goreleaser/goreleaser:v0.108.0

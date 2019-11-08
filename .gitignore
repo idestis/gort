@@ -11,5 +11,7 @@ gort
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
-
+c.out
 dist
+coverage.html
+codeclimate/**
