@@ -1,6 +1,6 @@
 # GORT
 
-[![Build Status](https://cloud.drone.io/api/badges/idestis/gort/status.svg)](https://cloud.drone.io/idestis/gort)
+[![Build Status](https://cloud.drone.io/api/badges/idestis/gort/status.svg)](https://cloud.drone.io/idestis/gort) [![GoDoc](https://godoc.org/github.com/idestis/gort/utils?status.svg)](https://godoc.org/github.com/idestis/gort/utils)
 
 
 ![Moving Gopher as GORT](./assets/gort.png)

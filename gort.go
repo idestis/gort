@@ -62,8 +62,8 @@ func main() {
 			log.Println("GORT_RATE_LIMIT was set globally for", rl)
 			r.Use(middleware.Throttle(rl))
 		}
-		r.Post("/start", startScriptHandler)                            // /v1/start
-		r.Get("/list-dist", listScriptsHandler)                         // /v1/list-dist
+		r.Post("/start", StartScriptHandler)                            // /v1/start
+		r.Get("/list-dist", ListScriptsHandler)                         // /v1/list-dist
 		r.Get("/health", func(w http.ResponseWriter, r *http.Request) { // /v1/health
 			w.Write([]byte("OK"))
 		})
@@ -75,8 +75,8 @@ func main() {
 
 }
 
-// listScriptsHandler will return scripts list from the SCRIPTS_DIR
-func listScriptsHandler(w http.ResponseWriter, r *http.Request) {
+// ListScriptsHandler will return scripts list from the SCRIPTS_DIR
+func ListScriptsHandler(w http.ResponseWriter, r *http.Request) {
 	if len(scripts) == 0 {
 		fmt.Fprintf(w, "%s seems like empty", scriptsDir)
 		return
@@ -86,8 +86,8 @@ func listScriptsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// startScriptHandler will start requested script and print output to stdout
-func startScriptHandler(w http.ResponseWriter, r *http.Request) {
+// StartScriptHandler will start requested script and print output to stdout
+func StartScriptHandler(w http.ResponseWriter, r *http.Request) {
 	var script Script
 	err := json.NewDecoder(r.Body).Decode(&script)
 	if err != nil {
