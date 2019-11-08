@@ -1,6 +1,6 @@
 # GORT
 
-[![Build Status](https://cloud.drone.io/api/badges/idestis/gort/status.svg)](https://cloud.drone.io/idestis/gort) [![GoDoc](https://godoc.org/github.com/idestis/gort/utils?status.svg)](https://godoc.org/github.com/idestis/gort/utils) [![Go Report Card](https://goreportcard.com/badge/github.com/idestis/gort)](https://goreportcard.com/report/github.com/idestis/gort) [![Maintainability](https://api.codeclimate.com/v1/badges/1b54e8fa41f52542fdd4/maintainability)](https://codeclimate.com/github/idestis/gort/maintainability)
+[![Build Status](https://cloud.drone.io/api/badges/idestis/gort/status.svg)](https://cloud.drone.io/idestis/gort) [![GoDoc](https://godoc.org/github.com/idestis/gort/utils?status.svg)](https://godoc.org/github.com/idestis/gort/utils) [![Go Report Card](https://goreportcard.com/badge/github.com/idestis/gort)](https://goreportcard.com/report/github.com/idestis/gort) [![Maintainability](https://api.codeclimate.com/v1/badges/1b54e8fa41f52542fdd4/maintainability)](https://codeclimate.com/github/idestis/gort/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/1b54e8fa41f52542fdd4/test_coverage)](https://codeclimate.com/github/idestis/gort/test_coverage)
 
 ![Moving Gopher as GORT](./assets/gort.png)
 
