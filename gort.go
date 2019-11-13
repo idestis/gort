@@ -33,6 +33,7 @@ var (
 	scripts    []string
 )
 
+// init is here with one reason gort need to be initialized first
 func init() {
 	port, _ = strconv.Atoi(os.Getenv("PORT"))
 	if port == 0 {
@@ -135,7 +136,7 @@ func StartScriptHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "The function will be executed in the background. Refer to container logs to see the output")
 }
 
-// NotFoundHandler will return error message
+// NotFoundHandler will return custom error message
 func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "This page does not exist!", 404)
 }
