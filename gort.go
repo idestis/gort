@@ -1,4 +1,4 @@
-package main
+package gort
 
 import (
 	"encoding/json"
