@@ -16,14 +16,21 @@ import (
 
 // Script sctruct will hold an entity to define which script we should run
 type Script struct {
-	Executor string   `json:"executor"`
-	Script   string   `json:"script"`
-	EnvVars  []string `json:"env_vars"`
-	Args     []string `json:"args"`
+	// Executor defines the name of
+	// the interpreter program to be executed
+	Executor string `json:"executor"`
+	// Script will refer to script name from the dist folder
+	Script string `json:"script"`
+	// EnvVars slice will hold all environment variables for the script
+	EnvVars []string `json:"env_vars"`
+	// Args slice will hold additional arguments for the command
+	Args []string `json:"args"`
 }
 
 const (
-	defaultPort       = 5000
+	// defaultPort if not specified as environment variable
+	defaultPort = 5000
+	// defaultScriptsDir is a path to find scripts
 	defaultScriptsDir = "./dist"
 )
 
