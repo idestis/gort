@@ -1,5 +1,5 @@
-// Package utils provides helpers to make gort working such as
-// directory scanners or slice search
+// Package utils provides helpers for gort such as
+// directory scanner or slice search
 package utils
 
 import "io/ioutil"
