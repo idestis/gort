@@ -4,7 +4,6 @@ import "testing"
 
 func TestScanScripts(t *testing.T) {
 	result := ScanScripts("../dist")
-
 	if len(result) > 0 {
 		t.Errorf("ScanScripts returned unexpected lenght: got %d want %d", len(result), 0)
 	}
@@ -12,12 +11,12 @@ func TestScanScripts(t *testing.T) {
 
 func TestFind(t *testing.T) {
 	testData := []string{"apple", "carrot", "manzana", "pineapple", "melon", "banana"}
-	test := []string{"pineapple", "banana"}
+	test := map[string]bool{"pineapple": true, "banana": true, "dragonfruit": false}
 
-	for i, v := range test {
-		_, err := Find(testData, v)
-		if !err {
-			t.Errorf("%d: Find for %v returned %v want %v", i, v, err, true)
+	for value, expect := range test {
+		_, err := Find(testData, value)
+		if err != expect {
+			t.Errorf("Find for %v returned %v want %v", value, expect, err)
 		}
 	}
 
