@@ -25,3 +25,15 @@ func TestListScripts(t *testing.T) {
 			rr.Body.String(), expected)
 	}
 }
+
+func TestNotFound(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/any-url", nil)
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(NotFoundHandler)
+	handler.ServeHTTP(rr, req)
+	expected := "This page does not exist!"
+	if rr.Body.String() != expected && rr.Code != http.StatusNotFound {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			rr.Body.String(), expected)
+	}
+}
