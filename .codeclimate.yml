@@ -3,10 +3,6 @@ engines:
   gofmt: { enabled: true }
   golint: { enabled: true }
   govet: { enabled: true }
-exclude_paths:
-  - "**/*_test.go"
-  - "*_test.go"
-  - "**_test.go"
 ratings:
   paths:
     - "**.go"
