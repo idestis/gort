@@ -1,0 +1,10 @@
+language: go
+
+# Versions of go that are explicitly supported.
+go:
+ - 1.13.x
+ - 1.12.x
+
+notifications:
+  email:
+    - idestis@gmail.com
