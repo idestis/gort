@@ -49,11 +49,11 @@ func init() {
 	scriptsDir = os.Getenv("SCRIPTS_DIR")
 	if scriptsDir == "" {
 		scriptsDir = defaultScriptsDir
-		if _, err := os.Stat(scriptsDir); os.IsNotExist(err) {
-			log.Panic(err)
-		}
-		scripts = utils.ScanScripts(scriptsDir)
 	}
+	if _, err := os.Stat(scriptsDir); os.IsNotExist(err) {
+		log.Panic(err)
+	}
+	scripts = utils.ScanScripts(scriptsDir)
 }
 
 func main() {
