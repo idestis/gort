@@ -14,15 +14,12 @@ builds:
     ldflags:
       - -s -w
     goos: [freebsd, windows, linux, darwin]
-    goarch: [amd64, arm, arm64]
-    goarm: ["6", "7"]
-    ignore:
-      - { goos: linux, goarch: arm, goarm: "7" }
+    goarch: [arm64]
 
 archives:
   - id: gort
     ids: [gort]
-    # Raw binaries (e.g. gort_1.2.1_linux_amd64), as used by the README's Dockerfile wget.
+    # Raw binaries (e.g. gort_2.0.0_linux_arm64), as used by the README's Dockerfile wget.
     formats: [binary]
 
 checksum:

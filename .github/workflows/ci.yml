@@ -43,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-24.04-arm, macos-latest]
     env:
       QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}
     steps:
@@ -58,7 +58,7 @@ jobs:
       # Skipped unless the QLTY_COVERAGE_TOKEN secret is configured.
       - name: Upload coverage to Qlty
         if: >-
-          matrix.os == 'ubuntu-latest' &&
+          matrix.os == 'ubuntu-24.04-arm' &&
           github.event_name == 'push' &&
           github.ref == 'refs/heads/main' &&
           env.QLTY_COVERAGE_TOKEN != ''
@@ -70,8 +70,8 @@ jobs:
           strip-prefix: github.com/idestis/gort/
 
   build:
-    name: Build
-    runs-on: ubuntu-latest
+    name: Build (linux/arm64)
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
@@ -84,4 +84,4 @@ jobs:
         run: |
           test -x gort
           file gort
-          file gort | grep -q 'ELF 64-bit LSB executable'
+          file gort | grep -q 'ELF 64-bit LSB executable, ARM aarch64'
