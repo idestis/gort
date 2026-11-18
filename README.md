@@ -112,7 +112,7 @@ Download a binary from the [releases page](https://github.com/idestis/gort/relea
 Requires Go 1.27 or newer.
 
 ```bash
-go build -o gort .
+go build -o gort ./cmd/gort
 ```
 
 ## Docker example
@@ -155,9 +155,18 @@ That makes gort a simple target for scheduled jobs in Kubernetes CronJobs, Jenki
 
 ## Development
 
+```text
+cmd/gort/           entry point: wiring, signal handling, graceful shutdown
+internal/config/    environment variable loading
+internal/policy/    executor and env var allowlists
+internal/runner/    process launch, reaping and concurrency limit
+internal/server/    HTTP router, handlers, auth middleware
+```
+
 ```bash
 go vet ./...
 go test -race ./...
+go run ./cmd/gort
 ```
 
 CI runs on GitHub Actions. Pushing a `v*` tag builds and publishes the release with GoReleaser.

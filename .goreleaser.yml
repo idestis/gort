@@ -6,7 +6,7 @@ dist: .goreleaser-dist
 builds:
   - id: gort
     binary: gort
-    main: .
+    main: ./cmd/gort
     env:
       - CGO_ENABLED=0
     flags:

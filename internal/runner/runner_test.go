@@ -1,10 +1,10 @@
-package gort
+package runner
 
 import (
 	"bytes"
 	"context"
 	"errors"
-	"io/ioutil"
+	"io"
 	"log"
 	"os/exec"
 	"runtime"
@@ -22,7 +22,7 @@ func skipWithoutShell(t *testing.T) {
 	}
 }
 
-func quietLogger() *log.Logger { return log.New(ioutil.Discard, "", 0) }
+func quietLogger() *log.Logger { return log.New(io.Discard, "", 0) }
 
 // syncBuffer is a goroutine-safe log sink.
 type syncBuffer struct {
@@ -56,7 +56,7 @@ func waitIdle(t *testing.T, r *Runner, timeout time.Duration) {
 func TestRunnerReapsProcess(t *testing.T) {
 	skipWithoutShell(t)
 	logs := &syncBuffer{}
-	r := NewRunner(2, log.New(logs, "", 0))
+	r := New(2, log.New(logs, "", 0))
 	pid, err := r.Start("exit3", exec.Command("sh", "-c", "exit 3"))
 	if err != nil {
 		t.Fatal(err)
@@ -78,7 +78,7 @@ func TestRunnerReapsProcess(t *testing.T) {
 
 func TestRunnerBusyAndSlotFrees(t *testing.T) {
 	skipWithoutShell(t)
-	r := NewRunner(1, quietLogger())
+	r := New(1, quietLogger())
 	if _, err := r.Start("short", exec.Command("sleep", "0.2")); err != nil {
 		t.Fatal(err)
 	}
@@ -94,7 +94,7 @@ func TestRunnerBusyAndSlotFrees(t *testing.T) {
 
 func TestRunnerStartErrorReleasesSlot(t *testing.T) {
 	skipWithoutShell(t)
-	r := NewRunner(1, quietLogger())
+	r := New(1, quietLogger())
 	if _, err := r.Start("missing", exec.Command("/nonexistent/gort-binary")); err == nil {
 		t.Fatal("expected start error")
 	}
@@ -109,7 +109,7 @@ func TestRunnerStartErrorReleasesSlot(t *testing.T) {
 
 func TestRunnerShutdownWaits(t *testing.T) {
 	skipWithoutShell(t)
-	r := NewRunner(2, quietLogger())
+	r := New(2, quietLogger())
 	if _, err := r.Start("short", exec.Command("sleep", "0.2")); err != nil {
 		t.Fatal(err)
 	}
@@ -128,7 +128,7 @@ func TestRunnerShutdownWaits(t *testing.T) {
 
 func TestRunnerShutdownTerminatesOnTimeout(t *testing.T) {
 	skipWithoutShell(t)
-	r := NewRunner(2, quietLogger())
+	r := New(2, quietLogger())
 	pid, err := r.Start("long", exec.Command("sleep", "30"))
 	if err != nil {
 		t.Fatal(err)
@@ -158,7 +158,7 @@ func TestRunnerShutdownTerminatesOnTimeout(t *testing.T) {
 func TestRunnerConcurrentStartsRespectLimit(t *testing.T) {
 	skipWithoutShell(t)
 	const limit, callers = 3, 40
-	r := NewRunner(limit, quietLogger())
+	r := New(limit, quietLogger())
 
 	var (
 		wg      sync.WaitGroup

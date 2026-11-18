@@ -1,4 +1,4 @@
-package gort
+package policy
 
 import (
 	"errors"
@@ -34,7 +34,7 @@ func TestCheckExecutor(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := LoadPolicy(envFunc(map[string]string{envAllowedExecutors: tt.allowed}))
+			p := Load(envFunc(map[string]string{envAllowedExecutors: tt.allowed}))
 			err := p.CheckExecutor(tt.executor)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("CheckExecutor(%q) error = %v, wantErr %v", tt.executor, err, tt.wantErr)
@@ -119,7 +119,7 @@ func TestCheckEnvVars(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := LoadPolicy(envFunc(map[string]string{
+			p := Load(envFunc(map[string]string{
 				envAllowedExecutors: "python3",
 				envAllowedEnvVars:   tt.allowed,
 			}))
@@ -150,7 +150,7 @@ func TestHardDenylistAlwaysWins(t *testing.T) {
 		"DYLD_INSERT_LIBRARIES", "DYLD_LIBRARY_PATH",
 	}
 	allowed := "*," + strings.Join(keys, ",")
-	p := LoadPolicy(envFunc(map[string]string{envAllowedEnvVars: allowed}))
+	p := Load(envFunc(map[string]string{envAllowedEnvVars: allowed}))
 	for _, k := range keys {
 		t.Run(k, func(t *testing.T) {
 			err := p.CheckEnvVars([]string{k + "=x"})
@@ -212,7 +212,7 @@ func TestWarnings(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := LoadPolicy(envFunc(tt.env)).Warnings()
+			w := Load(envFunc(tt.env)).Warnings()
 			if len(w) != tt.wantCount {
 				t.Errorf("got %d warnings, want %d: %q", len(w), tt.wantCount, w)
 			}
@@ -231,9 +231,9 @@ func TestWarnings(t *testing.T) {
 	}
 }
 
-func TestLoadPolicyReadsOnlyItsVariables(t *testing.T) {
+func TestLoadReadsOnlyItsVariables(t *testing.T) {
 	var seen []string
-	LoadPolicy(func(k string) string {
+	Load(func(k string) string {
 		seen = append(seen, k)
 		return ""
 	})

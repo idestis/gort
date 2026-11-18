@@ -1,4 +1,4 @@
-package gort
+package policy
 
 import (
 	"errors"
@@ -59,11 +59,11 @@ type Policy struct {
 	execConfigured bool
 }
 
-// LoadPolicy builds a Policy from GORT_ALLOWED_EXECUTORS and
+// Load builds a Policy from GORT_ALLOWED_EXECUTORS and
 // GORT_ALLOWED_ENV_VARS as returned by getenv (typically os.Getenv). Both are
 // comma-separated lists; entries are whitespace-trimmed and empty entries are
 // ignored. GORT_ALLOWED_ENV_VARS entries may end in "*" to allow a prefix.
-func LoadPolicy(getenv func(string) string) Policy {
+func Load(getenv func(string) string) Policy {
 	p := Policy{
 		executors: make(map[string]struct{}),
 		envExact:  make(map[string]struct{}),

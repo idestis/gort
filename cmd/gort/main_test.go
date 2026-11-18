@@ -10,10 +10,30 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
+	"sync"
 	"syscall"
 	"testing"
 	"time"
 )
+
+// syncBuffer is a goroutine-safe bytes.Buffer for capturing process output.
+type syncBuffer struct {
+	mu  sync.Mutex
+	buf strings.Builder
+}
+
+func (b *syncBuffer) Write(p []byte) (int, error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.buf.Write(p)
+}
+
+func (b *syncBuffer) String() string {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.buf.String()
+}
 
 // freePort asks the kernel for an unused TCP port.
 func freePort(t *testing.T) int {
@@ -47,11 +67,15 @@ func TestBinaryStartsAndStops(t *testing.T) {
 	if err := os.Mkdir(scriptsDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
+	if err := os.WriteFile(filepath.Join(scriptsDir, "hello.sh"), []byte("echo \"hello $1\"\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
 
 	port := freePort(t)
 	logs := &syncBuffer{}
 	cmd := exec.Command(bin)
-	cmd.Env = append(os.Environ(), fmt.Sprintf("PORT=%d", port), "SCRIPTS_DIR="+scriptsDir, "GORT_RATE_LIMIT=")
+	cmd.Env = append(os.Environ(), fmt.Sprintf("PORT=%d", port), "SCRIPTS_DIR="+scriptsDir, "GORT_RATE_LIMIT=",
+		"GORT_AUTH_TOKEN=s3cret", "GORT_ALLOWED_EXECUTORS=sh", "GORT_ALLOWED_ENV_VARS=")
 	cmd.Stdout = logs
 	cmd.Stderr = logs
 	if err := cmd.Start(); err != nil {
@@ -70,7 +94,8 @@ func TestBinaryStartsAndStops(t *testing.T) {
 		}
 	})
 
-	url := fmt.Sprintf("http://127.0.0.1:%d/v1/health", port)
+	base := fmt.Sprintf("http://127.0.0.1:%d", port)
+	url := base + "/v1/health"
 	client := &http.Client{Timeout: time.Second}
 	deadline := time.Now().Add(10 * time.Second)
 	for {
@@ -89,6 +114,33 @@ func TestBinaryStartsAndStops(t *testing.T) {
 		}
 		if time.Now().After(deadline) {
 			t.Fatalf("gort did not become healthy within 10s (last error: %v)", err)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+
+	// A real script run through the binary: auth is enforced and output reaches the logs.
+	start := func(token string) int {
+		req, _ := http.NewRequest(http.MethodPost, base+"/v1/start",
+			strings.NewReader(`{"executor":"sh","script":"hello.sh","args":["world"]}`))
+		if token != "" {
+			req.Header.Set("Authorization", "Bearer "+token)
+		}
+		resp, err := client.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		resp.Body.Close()
+		return resp.StatusCode
+	}
+	if code := start(""); code != http.StatusUnauthorized {
+		t.Fatalf("start without token: got %d want 401", code)
+	}
+	if code := start("s3cret"); code != http.StatusOK {
+		t.Fatalf("start with token: got %d want 200\n%s", code, logs.String())
+	}
+	for !strings.Contains(logs.String(), "hello world") {
+		if time.Now().After(deadline) {
+			t.Fatalf("script output not in logs:\n%s", logs.String())
 		}
 		time.Sleep(50 * time.Millisecond)
 	}

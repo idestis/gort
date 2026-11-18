@@ -1,4 +1,4 @@
-package gort
+package server
 
 import (
 	"crypto/sha256"

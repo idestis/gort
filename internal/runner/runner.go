@@ -1,4 +1,4 @@
-package gort
+package runner
 
 import (
 	"context"
@@ -54,9 +54,9 @@ type Runner struct {
 	procs   map[*os.Process]struct{}
 }
 
-// NewRunner returns a Runner allowing at most maxConcurrent processes at once
+// New returns a Runner allowing at most maxConcurrent processes at once
 // (values below 1 are treated as 1). A nil logger logs to stderr.
-func NewRunner(maxConcurrent int, logger *log.Logger) *Runner {
+func New(maxConcurrent int, logger *log.Logger) *Runner {
 	if maxConcurrent < 1 {
 		maxConcurrent = 1
 	}

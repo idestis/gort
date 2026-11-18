@@ -79,7 +79,7 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: go build
-        run: go build -o gort .
+        run: go build -o gort ./cmd/gort
       - name: Smoke check binary
         run: |
           test -x gort
