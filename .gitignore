@@ -18,3 +18,6 @@ codeclimate/**
 test-reporter
 # GoReleaser output (dist/ is gort scripts dir)
 .goreleaser-dist/
+
+# Claude Code agent worktrees
+.claude/worktrees/

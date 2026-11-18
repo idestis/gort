@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
 
 permissions:
@@ -60,7 +60,7 @@ jobs:
         if: >-
           matrix.os == 'ubuntu-latest' &&
           github.event_name == 'push' &&
-          github.ref == 'refs/heads/master' &&
+          github.ref == 'refs/heads/main' &&
           env.QLTY_COVERAGE_TOKEN != ''
         uses: qltysh/qlty-action/coverage@v2
         with:
