@@ -7,9 +7,6 @@ import (
 	"strings"
 )
 
-// authTokenEnv names the environment variable holding the shared API token.
-const authTokenEnv = "GORT_AUTH_TOKEN"
-
 // RequireToken returns middleware that rejects requests whose
 // "Authorization: Bearer <token>" header does not match token.
 // An empty token disables the check, which is meant only for trusted

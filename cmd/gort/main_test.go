@@ -42,7 +42,7 @@ func freePort(t *testing.T) int {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer l.Close()
+	defer func() { _ = l.Close() }()
 	return l.Addr().(*net.TCPAddr).Port
 }
 
@@ -107,7 +107,7 @@ func TestBinaryStartsAndStops(t *testing.T) {
 		resp, err := client.Get(url)
 		if err == nil {
 			body, _ := io.ReadAll(resp.Body)
-			resp.Body.Close()
+			_ = resp.Body.Close()
 			if resp.StatusCode == http.StatusOK && string(body) == "OK" {
 				break
 			}
@@ -129,7 +129,7 @@ func TestBinaryStartsAndStops(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		return resp.StatusCode
 	}
 	if code := start(""); code != http.StatusUnauthorized {

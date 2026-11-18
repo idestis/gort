@@ -41,11 +41,11 @@ func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
 // ListScriptsHandler lists the scripts found in SCRIPTS_DIR.
 func (s *Server) ListScriptsHandler(w http.ResponseWriter, r *http.Request) {
 	if len(s.names) == 0 {
-		fmt.Fprintf(w, "%s seems like empty", s.cfg.ScriptsDir)
+		_, _ = fmt.Fprintf(w, "%s seems like empty", s.cfg.ScriptsDir)
 		return
 	}
 	for _, name := range s.names {
-		fmt.Fprintln(w, name)
+		_, _ = fmt.Fprintln(w, name)
 	}
 }
 
@@ -116,5 +116,5 @@ func (s *Server) StartScriptHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("Just ran subprocess of", script.Script, "with PID", pid)
-	fmt.Fprintf(w, "The function will be executed in the background. Refer to container logs to see the output")
+	_, _ = fmt.Fprintf(w, "The function will be executed in the background. Refer to container logs to see the output")
 }
