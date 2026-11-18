@@ -2,7 +2,7 @@
 // directory scanner or slice search
 package utils
 
-import "io/ioutil"
+import "os"
 
 // Find takes a slice and looks for an element in it. If found it will
 // return it's key, otherwise it will return -1 and a bool of false.
@@ -18,7 +18,7 @@ func Find(slice []string, val string) (int, bool) {
 // ScanScripts will parse folder to get scripts list on startup
 func ScanScripts(dir string) []string {
 	var data []string
-	scriptsList, _ := ioutil.ReadDir(dir)
+	scriptsList, _ := os.ReadDir(dir)
 	for _, s := range scriptsList {
 		data = append(data, s.Name())
 	}
