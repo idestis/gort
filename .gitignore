@@ -21,3 +21,6 @@ test-reporter
 
 # Claude Code agent worktrees
 .claude/worktrees/
+
+# Task (taskfile.dev) checksum cache
+.task/
