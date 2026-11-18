@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: gofmt
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [ -n "$unformatted" ]; then
+            echo "The following files are not gofmt-formatted:"
+            echo "$unformatted"
+            exit 1
+          fi
+      - name: go vet
+        run: go vet ./...
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: latest
+
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    env:
+      QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: go test
+        run: go test -race -coverprofile=c.out ./...
+      # Code Climate Quality is now Qlty and the old test-reporter is archived.
+      # Skipped unless the QLTY_COVERAGE_TOKEN secret is configured.
+      - name: Upload coverage to Qlty
+        if: >-
+          matrix.os == 'ubuntu-latest' &&
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/master' &&
+          env.QLTY_COVERAGE_TOKEN != ''
+        uses: qltysh/qlty-action/coverage@v2
+        with:
+          token: ${{ env.QLTY_COVERAGE_TOKEN }}
+          files: c.out
+          format: coverprofile
+          strip-prefix: github.com/idestis/gort/
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: go build
+        run: go build -o gort .
+      - name: Smoke check binary
+        run: |
+          test -x gort
+          file gort
+          file gort | grep -q 'ELF 64-bit LSB executable'
