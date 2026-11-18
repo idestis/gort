@@ -2,7 +2,9 @@
 
 [![CI](https://github.com/idestis/gort/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/idestis/gort/actions/workflows/ci.yml) [![GoDoc](https://godoc.org/github.com/idestis/gort?status.svg)](https://godoc.org/github.com/idestis/gort) [![Go Report Card](https://goreportcard.com/badge/github.com/idestis/gort)](https://goreportcard.com/report/github.com/idestis/gort) [![Maintainability](https://api.codeclimate.com/v1/badges/1b54e8fa41f52542fdd4/maintainability)](https://codeclimate.com/github/idestis/gort/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/1b54e8fa41f52542fdd4/test_coverage)](https://codeclimate.com/github/idestis/gort/test_coverage)
 
-![Moving Gopher as GORT](./assets/gort.png)
+<p align="center">
+  <img src="./assets/MovingGopher.png" alt="Moving Gopher as GORT" width="150">
+</p>
 
 **GORT** is a simple HTTP handler to receive remote calls to run scripts bundled in Docker containers. Why the name is `gort` -  because the idea is "GO-Run-Things"
 
