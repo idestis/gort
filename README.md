@@ -1,6 +1,6 @@
 # GORT
 
-[![Build Status](https://cloud.drone.io/api/badges/idestis/gort/status.svg)](https://cloud.drone.io/idestis/gort) [![GoDoc](https://godoc.org/github.com/idestis/gort?status.svg)](https://godoc.org/github.com/idestis/gort) [![Go Report Card](https://goreportcard.com/badge/github.com/idestis/gort)](https://goreportcard.com/report/github.com/idestis/gort) [![Maintainability](https://api.codeclimate.com/v1/badges/1b54e8fa41f52542fdd4/maintainability)](https://codeclimate.com/github/idestis/gort/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/1b54e8fa41f52542fdd4/test_coverage)](https://codeclimate.com/github/idestis/gort/test_coverage)
+[![CI](https://github.com/idestis/gort/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/idestis/gort/actions/workflows/ci.yml) [![GoDoc](https://godoc.org/github.com/idestis/gort?status.svg)](https://godoc.org/github.com/idestis/gort) [![Go Report Card](https://goreportcard.com/badge/github.com/idestis/gort)](https://goreportcard.com/report/github.com/idestis/gort) [![Maintainability](https://api.codeclimate.com/v1/badges/1b54e8fa41f52542fdd4/maintainability)](https://codeclimate.com/github/idestis/gort/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/1b54e8fa41f52542fdd4/test_coverage)](https://codeclimate.com/github/idestis/gort/test_coverage)
 
 ![Moving Gopher as GORT](./assets/gort.png)
 
@@ -125,10 +125,12 @@ The function will be executed in the background. Refer to container logs to see 
 
 Binary are available for download on the [Project Release Page](https://github.com/idestis/gort/releases)
 
-However, you also able to change something in the source code and build your ``Gort`` for yourself
+Release assets are raw binaries named `gort_<version>_<os>_<arch>` (for example `gort_1.2.1_linux_amd64`), plus a `checksums.txt` file.
+
+You can also change the source code and build ``Gort`` yourself from the repository root:
 
 ```bash
-$ go build ./...
+$ go build -o gort .
 ```
 
 ## Use cases

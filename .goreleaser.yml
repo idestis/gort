@@ -1,15 +1,33 @@
+version: 2
+
+# gort's default SCRIPTS_DIR is ./dist, so keep goreleaser's output elsewhere.
+dist: .goreleaser-dist
+
 builds:
   - id: gort
     binary: gort
-    main: ./gort.go
+    main: .
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
     goos: [freebsd, windows, linux, darwin]
     goarch: [amd64, arm, arm64]
-    goarm: [6, 7]
+    goarm: ["6", "7"]
     ignore:
-      - { goos: darwin, goarch: 386 }
-      - { goos: linux, goarch: arm, goarm: 7 }
+      - { goos: linux, goarch: arm, goarm: "7" }
 
 archives:
   - id: gort
-    builds: [gort]
-    format: binary
+    ids: [gort]
+    # Raw binaries (e.g. gort_1.2.1_linux_amd64), as used by the README's Dockerfile wget.
+    formats: [binary]
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: git
+  sort: asc
