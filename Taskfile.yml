@@ -1,0 +1,103 @@
+# https://taskfile.dev — run `task` to list available tasks.
+version: "3"
+
+vars:
+  BIN: gort
+  GORELEASER: go run github.com/goreleaser/goreleaser/v2@v2.20.2
+
+tasks:
+  default:
+    silent: true
+    cmds:
+      - task --list
+
+  fmt:
+    desc: Format Go code
+    cmds:
+      - gofmt -w .
+
+  lint:
+    desc: Check formatting and run go vet (CI also runs golangci-lint)
+    cmds:
+      - |
+        unformatted="$(gofmt -l .)"
+        if [ -n "$unformatted" ]; then
+          echo "Not gofmt-formatted (run 'task fmt'):"; echo "$unformatted"; exit 1
+        fi
+      - go vet ./...
+      - |
+        if command -v golangci-lint >/dev/null; then
+          golangci-lint run
+        else
+          echo "golangci-lint not installed, skipping (CI runs it)"
+        fi
+
+  test:
+    desc: Run tests with the race detector and write coverage to c.out
+    cmds:
+      - go test -race -coverprofile=c.out ./...
+
+  build:
+    desc: Build gort for this machine into ./gort
+    sources: ["**/*.go", go.mod, go.sum]
+    generates: ["{{.BIN}}"]
+    cmds:
+      - go build -trimpath -ldflags "-s -w" -o {{.BIN}} ./cmd/gort
+
+  build:arm64:
+    desc: Cross-compile the linux/arm64 release binary into ./gort
+    env:
+      CGO_ENABLED: "0"
+      GOOS: linux
+      GOARCH: arm64
+    cmds:
+      - go build -trimpath -ldflags "-s -w" -o {{.BIN}} ./cmd/gort
+
+  run:
+    desc: Run gort locally (sh allowed, token "dev", scripts in ./dist)
+    env:
+      GORT_AUTH_TOKEN: '{{.GORT_AUTH_TOKEN | default "dev"}}'
+      GORT_ALLOWED_EXECUTORS: '{{.GORT_ALLOWED_EXECUTORS | default "sh"}}'
+    cmds:
+      - mkdir -p dist
+      - go run ./cmd/gort
+
+  ci:
+    desc: Everything CI checks, in order
+    cmds:
+      - task: lint
+      - task: test
+      - task: build
+
+  release:check:
+    desc: Validate the GoReleaser config
+    cmds:
+      - "{{.GORELEASER}} check"
+
+  release:snapshot:
+    desc: Build all release artifacts locally into .goreleaser-dist (nothing is published)
+    cmds:
+      - "{{.GORELEASER}} release --snapshot --clean --skip=publish"
+
+  release:
+    desc: "Tag and push a release, e.g. task release VERSION=1.3.0 (GitHub Actions publishes it)"
+    requires:
+      vars: [VERSION]
+    vars:
+      TAG: v{{trimPrefix "v" .VERSION}}
+    preconditions:
+      - sh: '[[ "{{.TAG}}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]'
+        msg: "VERSION must be semver, e.g. 1.3.0"
+      - sh: '[ "$(git branch --show-current)" = main ]'
+        msg: "Releases are cut from main"
+      - sh: "[ -z \"$(git status --porcelain)\" ]"
+        msg: "Working tree is not clean"
+      - sh: "! git rev-parse -q --verify refs/tags/{{.TAG}} >/dev/null"
+        msg: "Tag {{.TAG}} already exists"
+    cmds:
+      - git fetch origin main --tags
+      - '[ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ] || { echo "main is not in sync with origin/main"; exit 1; }'
+      - task: ci
+      - git tag -a {{.TAG}} -m "Release {{.TAG}}"
+      - git push origin {{.TAG}}
+      - echo "Pushed {{.TAG}}. Follow the release at https://github.com/idestis/gort/actions/workflows/release.yml"

@@ -22,16 +22,12 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-      - name: gofmt
-        run: |
-          unformatted="$(gofmt -l .)"
-          if [ -n "$unformatted" ]; then
-            echo "The following files are not gofmt-formatted:"
-            echo "$unformatted"
-            exit 1
-          fi
-      - name: go vet
-        run: go vet ./...
+      - uses: go-task/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: gofmt + go vet
+        run: task lint
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
@@ -52,8 +48,12 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      - uses: go-task/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: go test
-        run: go test -race -coverprofile=c.out ./...
+        run: task test
       # Code Climate Quality is now Qlty and the old test-reporter is archived.
       # Skipped unless the QLTY_COVERAGE_TOKEN secret is configured.
       - name: Upload coverage to Qlty
@@ -78,8 +78,12 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      - uses: go-task/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: go build
-        run: go build -o gort ./cmd/gort
+        run: task build
       - name: Smoke check binary
         run: |
           test -x gort

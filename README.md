@@ -105,7 +105,7 @@ Responses:
 
 ### Binary
 
-Download a binary from the [releases page](https://github.com/idestis/gort/releases). Releases are built for **arm64 only** (linux, darwin, windows, freebsd). Assets are raw binaries named `gort_<version>_<os>_arm64` (for example `gort_2.0.0_linux_arm64`), plus a `checksums.txt` file. For other architectures, build from source.
+Download a binary from the [releases page](https://github.com/idestis/gort/releases). Releases are built for **arm64 only** (linux, darwin, windows, freebsd). Assets are raw binaries named `gort_<version>_<os>_arm64` (for example `gort_1.3.0_linux_arm64`; Windows adds `.exe`), plus a `checksums.txt` file. For other architectures, build from source.
 
 ### From source
 
@@ -117,31 +117,51 @@ go build -o gort ./cmd/gort
 
 ## Docker example
 
-Build your scripts in one stage, then bundle them with gort and the interpreters they need:
+Build your scripts in one stage, then bundle them with gort and the interpreters they need. The image verifies the download against the release's `checksums.txt`, runs as a non-root user, and has a health check:
 
 ```Dockerfile
-# arm64 image: build with --platform=linux/arm64 or on an arm64 host.
-FROM node:22 AS builder
+# syntax=docker/dockerfile:1
+# Gort releases are arm64-only, so the runtime image is pinned to linux/arm64.
+
+# STEP 1: build the scripts (output must land in /app/dist)
+FROM --platform=$BUILDPLATFORM node:24-alpine AS builder
 WORKDIR /app
+COPY package*.json ./
+RUN npm ci
 COPY . .
-RUN npm ci && npm run build
+RUN npm run build
 
-FROM alpine:3.22
-ARG GORT_VERSION=2.0.0
-WORKDIR /app
+# STEP 2: runtime image with gort, the interpreters and the scripts
+FROM --platform=linux/arm64 alpine:3.24
+ARG GORT_VERSION=1.3.0
+ARG GORT_URL=https://github.com/idestis/gort/releases/download/v${GORT_VERSION}
 RUN apk add --no-cache nodejs ca-certificates tini && \
-    wget -q "https://github.com/idestis/gort/releases/download/v${GORT_VERSION}/gort_${GORT_VERSION}_linux_arm64" -O /usr/local/bin/gort && \
-    chmod +x /usr/local/bin/gort
-COPY --from=builder /app/dist /app/dist
+    cd /tmp && \
+    wget -q "${GORT_URL}/gort_${GORT_VERSION}_linux_arm64" "${GORT_URL}/checksums.txt" && \
+    grep " gort_${GORT_VERSION}_linux_arm64\$" checksums.txt | sha256sum -c - && \
+    install -m 0755 "gort_${GORT_VERSION}_linux_arm64" /usr/local/bin/gort && \
+    rm -f /tmp/gort_* /tmp/checksums.txt && \
+    adduser -D -H -s /sbin/nologin gort
 
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+USER gort
+
+# Provide GORT_AUTH_TOKEN at runtime, e.g. from a Kubernetes Secret.
 ENV PORT=8080 \
     GORT_ALLOWED_EXECUTORS=node
-# Provide GORT_AUTH_TOKEN at runtime, e.g. from a Kubernetes Secret.
 EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=3s CMD wget -qO /dev/null http://127.0.0.1:8080/v1/health || exit 1
+# tini runs as PID 1 and reaps orphaned grandchildren of your scripts.
 ENTRYPOINT ["/sbin/tini", "--", "gort"]
 ```
 
-Use [tini](https://github.com/krallin/tini) (or `docker run --init`) as PID 1. Gort reaps the scripts it starts, but if a script backgrounds its own child processes and exits, those orphans are only cleaned up by a real init.
+```bash
+docker build -t my-crawlers .
+docker run -d -p 8080:8080 -e GORT_AUTH_TOKEN=s3cret my-crawlers
+```
+
+[tini](https://github.com/krallin/tini) runs as PID 1. Gort reaps the scripts it starts, but if a script backgrounds its own child processes and exits, those orphans are only cleaned up by a real init. `GORT_URL` can point at a mirror if GitHub is not reachable from your build.
 
 Trigger a run from anywhere inside the cluster:
 
@@ -163,13 +183,27 @@ internal/runner/    process launch, reaping and concurrency limit
 internal/server/    HTTP router, handlers, auth middleware
 ```
 
-```bash
-go vet ./...
-go test -race ./...
-go run ./cmd/gort
-```
+Common commands are in the [Taskfile](./Taskfile.yml) (install [Task](https://taskfile.dev/installation/), e.g. `brew install go-task`). Run `task` to list them.
 
-CI runs on GitHub Actions. Pushing a `v*` tag builds and publishes the release with GoReleaser.
+| Command | What it does |
+| --- | --- |
+| `task run` | Run gort locally with `sh` allowed and token `dev`, serving `./dist` |
+| `task lint` | `gofmt` check, `go vet`, and `golangci-lint` if installed |
+| `task test` | Tests with the race detector, coverage in `c.out` |
+| `task build` | Build `./gort` for this machine (`task build:arm64` for the linux/arm64 release binary) |
+| `task ci` | `lint`, `test` and `build`, exactly what CI runs |
+| `task release:snapshot` | Build every release artifact locally into `.goreleaser-dist`, publishing nothing |
+
+CI on GitHub Actions runs the same `task lint`, `task test` and `task build`, plus `golangci-lint`, on every push to `main` and every pull request.
+
+## Releasing
+
+Releases are built by GoReleaser in GitHub Actions and published to the [releases page](https://github.com/idestis/gort/releases). Pick one way:
+
+- **From your machine:** `task release VERSION=1.3.0`. It checks that you are on a clean `main` in sync with `origin`, runs `task ci`, then creates and pushes tag `v1.3.0`. The tag triggers the Release workflow.
+- **From GitHub:** go to **Actions → Release → Run workflow** and enter `1.3.0`. The workflow tags the tip of `main`, runs the tests, pushes the tag and publishes.
+
+Both refuse versions that aren't semver or tags that already exist.
 
 ## Roadmap
 
